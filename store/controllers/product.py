@@ -49,3 +49,23 @@ async def delete(
         await usecase.delete(id=id)
     except NotFoundException as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.message)
+
+# Consultar produto pelo nome parcial e case insesitive
+@router.get(path='/name/{name}', status_code=status.HTTP_200_OK)
+async def query_nome(name: str = Path(alias="name"), usecase: ProductUsecase = Depends()
+) -> ProductOut:
+    try:
+        return await usecase.query_nome(name=name)
+    except NotFoundException as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.message)
+
+# Consultar por faixa de preço
+@router.get(path='/price/', status_code=status.HTTP_200_OK,)
+async def query_price_range(min_price: float, max_price: float, usecase: ProductUsecase = Depends()
+) -> ProductOut:
+    try:
+        return await usecase.query_price_range(min_price, max_price)
+    except ValueError as vlr:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=vlr.message)
+    except NotFoundException as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=exc.message)
